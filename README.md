@@ -1,4 +1,4 @@
-# node-red-contrib-airship
+# node-red-contrib-airship-services
 
 Node-RED nodes for Airship 
 
@@ -6,7 +6,7 @@ Node-RED nodes for Airship
 
 From your Node-RED directory:
 
-`npm install node-red-contrib-airship`
+`npm install node-red-contrib-airship-services`
     
 ### Usage
 
