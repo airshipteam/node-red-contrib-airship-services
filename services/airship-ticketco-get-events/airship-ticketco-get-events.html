@@ -1,0 +1,53 @@
+<script type="text/javascript">
+    RED.nodes.registerType('TicketCo Get Events',{
+        category: 'Airship Services',
+        color: '#FFD300',
+        defaults: {
+            name      : {
+                value:""
+            },
+            token      : {
+                value:"", 
+                required:true
+            },
+            days_ahead : {
+                value:"", 
+                required:true
+            },
+            days_behind: {
+                value:"", 
+                required:true
+            }
+        },
+        inputs:1,
+        outputs: 2,
+        outputLabels:['success','error'],
+        icon: "icons/ticketco_logo.svg",
+        label: function() {
+            return this.name||"TicketCo Get Events";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="TicketCo Get Events">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-token"><i class="icon-tag"></i> Token</label>
+        <input type="text" id="node-input-token" placeholder="Token">
+    </div>
+    <div class="form-row">
+        <label for="node-input-days_behind"><i class="icon-tag"></i> Days in the past</label>
+        <input type="text" id="node-input-days_behind" placeholder="Days in the past">
+    </div>
+    <div class="form-row">
+        <label for="node-input-days_ahead"><i class="icon-tag"></i> Days in the future</label>
+        <input type="text" id="node-input-days_ahead" placeholder="Days in the future">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="TicketCo Get Events">
+    <p>Retrievs events between days in the past and future from the ticketco API </p>
+</script>
