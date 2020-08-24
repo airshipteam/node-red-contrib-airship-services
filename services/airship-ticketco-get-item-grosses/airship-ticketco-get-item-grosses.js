@@ -9,8 +9,10 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,config);
 
         this.config = config;
+        this.msg = {};
 
         this.on('input', (msg) => {
+        	this.msg = msg;
         	this.getGrosses(config.token, msg.payload.page, msg.payload.event_id);
         });
 
@@ -24,19 +26,21 @@ module.exports = function(RED) {
         };
 
         /**
-		 * Logs an error message
-		 * @param  {[string]} msg [error message]
-		 */
-        this.error = (payload) => {
-        	this.send(null,{payload:payload});
-        };
-
-        /**
 		 * Outputs success
 		 * @param  {[string]} msg [success message]
 		 */
         this.showsuccess = (payload) => {
-        	this.send({payload:payload},null);
+        	this.msg.payload = payload;
+        	this.send([this.msg,null]);
+        };
+
+        /**
+		 * Logs an error message
+		 * @param  {[string]} msg [error message]
+		 */
+        this.showerror = (payload) => {
+        	this.msg.payload = payload;
+        	this.send([null,this.msg]);
         };
 
         /**
@@ -95,7 +99,6 @@ module.exports = function(RED) {
 
 	    	axios.get('https://ticketco.events:443/api/public/v1/item_grosses?token='+token+'&event_id='+event_id+'&page='+page)
 			.then( (response) => {
-
 				// handle success
 				this.showstatus("yellow","dot","Data retrieved");
 	            this.showsuccess({item_grosses:response.data.item_grosses});
@@ -103,7 +106,7 @@ module.exports = function(RED) {
 			})
 			.catch( (error) => {
 				this.showstatus("red","dot","API Failure");
-				this.error(error);
+				this.showerror(error);
 			})
 			.finally( () => {
 				this.showstatus("green","dot","Data retrieved");

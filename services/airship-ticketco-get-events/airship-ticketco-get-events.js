@@ -9,35 +9,22 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,config);
 
         this.config = config;
+        this.msg = {};
 
         this.on('input', (msg) => {
+        	this.msg = msg;
         	let days = this.getDaysArray(Number(config.days_behind), Number(config.days_ahead));
         	this.getEvents(config.token, days);
         });
 
-		/**
-		 * Logs a message for debugging
-		 * @param  {[string]} msg [debug message]
-		 */
-		
-        this.log = (msg) => {
-        	this.send({payload:{message:msg}});
-        };
-
-        /**
-		 * Logs an error message
-		 * @param  {[string]} msg [error message]
-		 */
-        this.error = (payload) => {
-        	this.send([null,{payload:payload}]);
-        };
 
         /**
 		 * Outputs success
 		 * @param  {[string]} msg [success message]
 		 */
         this.showsuccess = (payload) => {
-        	this.send([{payload:payload},null]);
+        	this.msg.payload = payload;
+        	this.send([this.msg,null]);
         };
 
         /**
@@ -45,7 +32,8 @@ module.exports = function(RED) {
 		 * @param  {[string]} msg [error message]
 		 */
         this.showerror = (payload) => {
-        	this.send([null,{payload:payload}]);
+        	this.msg.payload = payload;
+        	this.send([null,this.msg]);
         };
 
         /**
