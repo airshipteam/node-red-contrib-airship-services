@@ -9,12 +9,10 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,config);
 
         this.config = config;
-        this.msg = {};
 
         this.on('input', (msg) => {
-        	this.msg = msg;
         	let days = this.getDaysArray(Number(config.days_behind), Number(config.days_ahead));
-        	this.getEvents(config.token, days);
+        	this.getEvents(msg,config.token, days);
         });
 
 
@@ -22,18 +20,18 @@ module.exports = function(RED) {
 		 * Outputs success
 		 * @param  {[string]} msg [success message]
 		 */
-        this.showsuccess = (payload) => {
-        	this.msg.payload = payload;
-        	this.send([this.msg,null]);
+        this.showsuccess = (msg,payload) => {
+        	msg.payload = payload;
+        	this.send([msg,null]);
         };
 
         /**
 		 * Logs an error message
 		 * @param  {[string]} msg [error message]
 		 */
-        this.showerror = (payload) => {
-        	this.msg.payload = payload;
-        	this.send([null,this.msg]);
+        this.showerror = (msg,payload) => {
+        	msg.payload = payload;
+        	this.send([null,msg]);
         };
 
         /**
@@ -83,7 +81,7 @@ module.exports = function(RED) {
 		 * @return {[void]}       
 		 */
 
-        this.getEvents = (token, days) =>
+        this.getEvents = (msg,token, days) =>
 	    {
 
 			this.showstatus("yellow","dot","Getting data");
@@ -96,6 +94,8 @@ module.exports = function(RED) {
 
 		    	axios.get('https://ticketco.events:443/api/public/v1/events?token='+token+'&start_at='+days[index])
 				.then( (response) => {
+
+
 					// handle success
 					this.showstatus("yellow","dot","Data retrieved for date "+days[index]);
 					event_count = event_count+response.data.events.length;
@@ -103,14 +103,16 @@ module.exports = function(RED) {
 				})
 				.catch( (error) => {
 					this.showstatus("red","dot","API Failure");
-					this.showerror(error);
+					this.showerror(msg,error);
 				})
 				.finally( () => {
+
+
 					completed++;
 					// if this is the final call, push on the message
 					if(completed == days.length){
 						this.showstatus("green","dot","Data retrieved");
-			            this.showsuccess({events:events, event_count:event_count});
+			            this.showsuccess(msg,{events:events, event_count:event_count});
 					}
 				});
 	    	}
