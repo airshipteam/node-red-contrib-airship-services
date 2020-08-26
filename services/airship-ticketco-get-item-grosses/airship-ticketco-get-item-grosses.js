@@ -9,38 +9,28 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,config);
 
         this.config = config;
-        this.msg = {};
 
         this.on('input', (msg) => {
-        	this.msg = msg;
-        	this.getGrosses(config.token, msg.payload.page, msg.payload.event_id);
+        	this.getGrosses(msg, config.token, msg.payload.page, msg.payload.event_id);
         });
 
-		/**
-		 * Logs a message for debugging
-		 * @param  {[string]} msg [debug message]
-		 */
-		
-        this.log = (msg) => {
-        	this.send({payload:{message:msg}});
-        };
 
         /**
 		 * Outputs success
 		 * @param  {[string]} msg [success message]
 		 */
-        this.showsuccess = (payload) => {
-        	this.msg.payload = payload;
-        	this.send([this.msg,null]);
+        this.showsuccess = (msg,payload) => {
+        	msg.payload = payload;
+        	this.send([msg,null]);
         };
 
         /**
 		 * Logs an error message
 		 * @param  {[string]} msg [error message]
 		 */
-        this.showerror = (payload) => {
-        	this.msg.payload = payload;
-        	this.send([null,this.msg]);
+        this.showerror = (msg,payload) => {
+        	msg.payload = payload;
+        	this.send([null,msg]);
         };
 
         /**
@@ -90,7 +80,7 @@ module.exports = function(RED) {
 		 * @return {[void]}       
 		 */
 
-        this.getGrosses = (token, page, event_id) =>
+        this.getGrosses = (msg, token, page, event_id) =>
 	    {
 
 			this.showstatus("yellow","dot","Getting data");
@@ -101,12 +91,12 @@ module.exports = function(RED) {
 			.then( (response) => {
 				// handle success
 				this.showstatus("yellow","dot","Data retrieved");
-	            this.showsuccess({item_grosses:response.data.item_grosses});
+	            this.showsuccess(msg,{item_grosses:response.data.item_grosses});
 
 			})
 			.catch( (error) => {
 				this.showstatus("red","dot","API Failure");
-				this.showerror(error);
+				this.showerror(msg,error);
 			})
 			.finally( () => {
 				this.showstatus("green","dot","Data retrieved");
